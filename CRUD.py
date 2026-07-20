@@ -18,7 +18,7 @@ tasks = [
     {"id": 2, "title": "Build CRUD endpoints", "done": False},
     {"id": 3, "title": "Test with Swagger UI", "done": True},
 ]
-@app.get("/tasks/{url_id}")
+@app.get("/tasks/{url_id}", status_code=200)
 def get_task(url_id):
     if url_id.isdigit():
         for task in tasks:
@@ -52,3 +52,24 @@ async def create_item(item: ItemCreate):
     newItem = Item(id=maxId,title=item.title,done=False)
     Items.append(newItem)
     return Items
+# stage 4
+class taskUpdate(BaseModel):
+    title: str
+    done: bool
+
+@app.put("/tasks/{task_id}")
+async def updata_item(task_id: int, task: taskUpdate):
+    for item in Items:
+        if item.id == task_id:
+            item.title = task.title
+            item.done = task.done
+            return item
+    return {'error':'404 not found'}
+        
+@app.delete("/tasks/{task_id}", status_code=204)
+async def delete_item(task_id: int):
+    for item in Items:
+        if item.id == task_id:
+            Items.remove(item)
+            return Items
+    return {'error':'404 not found'}
